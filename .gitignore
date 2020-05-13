@@ -10,6 +10,7 @@
 
 !docs
 !sqls
+!bin
 !src
 
 # maven
