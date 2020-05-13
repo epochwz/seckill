@@ -23,3 +23,14 @@ spring:
   mvc:
     throw-exception-if-no-handler-found: true # 统一异常处理：访问路径映射失败时自动抛出异常
     static-path-pattern: /static/** # 兼容处理静态资源访问路径：protocol://host/static/*
+
+server:
+  tomcat:
+    # 覆盖内嵌 Tomcat 的配置
+    max-connections: 8192 # 最大请求连接数
+    accept-count: 1000    # 等待队列的长度
+    max-threads: 150      # 最大工作线程数
+    min-spare-threads: 75 # 最小空闲线程数
+    # 定制内嵌 Tomcat 的配置
+    keepAliveTimeOut: 600       # 当客户端 10 分钟内没有发送请求时断开连接 (1s * 60 * 10)
+    maxKeepAliveRequests: 10000 # 当客户端单次连接中连续发送超过 10,000 个请求时自动断开连接

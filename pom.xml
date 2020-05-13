@@ -63,6 +63,11 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
     </dependency>
+    <dependency><!-- Custom Configuration Processor -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-configuration-processor</artifactId>
+      <optional>true</optional>
+    </dependency>
     <!-- ============================== DataBase ============================== -->
     <dependency>
       <groupId>org.springframework.boot</groupId>

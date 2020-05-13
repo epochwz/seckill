@@ -1,0 +1,16 @@
+{
+  "properties": [
+    {
+      "name": "server.tomcat.keepAliveTimeOut",
+      "type": "java.lang.Integer",
+      "description": "当客户端在指定时间内没有再发送请求时断开连接，单位是秒.",
+      "defaultValue": 300
+    },
+    {
+      "name": "server.tomcat.maxKeepAliveRequests",
+      "type": "java.lang.Integer",
+      "description": "当客户端在单次长连接内发送超过指定数量的请求时断开连接.",
+      "defaultValue": 10000
+    }
+  ]
+}
