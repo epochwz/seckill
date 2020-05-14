@@ -1,6 +1,8 @@
 logging:
   level:
-    # JPA SQL日志
+    # 项目模块的日志
+    fun.epoch: debug
+    # JPA SQL 日志
     org.hibernate.SQL: debug
     org.hibernate.engine.QueryParameters: debug
     org.hibernate.engine.query.HQLQueryPlan: debug
