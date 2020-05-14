@@ -34,3 +34,9 @@ server:
     # 定制内嵌 Tomcat 的配置
     keepAliveTimeOut: 600       # 当客户端 10 分钟内没有发送请求时断开连接 (1s * 60 * 10)
     maxKeepAliveRequests: 10000 # 当客户端单次连接中连续发送超过 10,000 个请求时自动断开连接
+    # 开启内嵌 Tomcat 的日志
+    basedir: tomcat
+    accesslog:
+      enabled: true
+      directory: logs
+      pattern: '%h %l %u %t "%r" %s %b %D'
