@@ -3,3 +3,10 @@
 
 # 跟踪重要文件
 !.gitignore
+
+!LICENSE
+
+!README.md
+
+!docs
+!src
