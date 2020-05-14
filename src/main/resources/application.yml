@@ -20,3 +20,5 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+  mvc:
+    throw-exception-if-no-handler-found: true # 统一异常处理：访问路径映射失败时自动抛出异常
