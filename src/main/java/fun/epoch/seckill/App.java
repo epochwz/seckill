@@ -7,7 +7,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @EnableJpaAuditing
 @EnableJpaRepositories
-@SpringBootApplication
+@SpringBootApplication(scanBasePackageClasses = {App.class,
+        fun.epoch.core.web.exception.UncaughtExceptionHandler.class
+})
 public class App {
     public static void main(String[] args) {
         SpringApplication.run(App.class, args);
