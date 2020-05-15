@@ -1,6 +1,9 @@
 package fun.epoch.seckill.controller;
 
+import fun.epoch.core.cache.redis.Redis;
+import fun.epoch.core.serialization.JSON;
 import fun.epoch.core.web.bean.BeanConverter;
+import fun.epoch.core.web.exception.BusinessException;
 import fun.epoch.core.web.response.Response;
 import fun.epoch.seckill.common.Constant;
 import fun.epoch.seckill.controller.params.UserParams;
@@ -13,9 +16,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import javax.validation.constraints.Pattern;
-import java.util.Random;
+import java.util.Optional;
+import java.util.UUID;
 
-import static fun.epoch.seckill.common.Constant.CURRENT_USER;
+import static fun.epoch.core.web.response.DefaultResponseCode.FORBIDDEN;
+import static fun.epoch.core.web.response.DefaultResponseCode.NOT_FOUND;
 import static fun.epoch.seckill.common.Constant.Patterns.PATTERN_PASSWORD;
 import static fun.epoch.seckill.common.Constant.Patterns.PATTERN_TELPHONE;
 
@@ -44,9 +49,11 @@ public class UserController {
 
     @PostMapping("/register")
     public Response<UserVO> register(@Validated @RequestBody UserParams params) {
-        String otpCode = (String) session.getAttribute(params.getTelphone());
-        if (!params.getOtpCode().equals(otpCode)) {
-            return Response.error("验证码错误，请重试");
+        boolean isMatch = Optional.ofNullable(Redis.get(params.getTelphone()))
+                .orElseThrow(() -> new BusinessException(NOT_FOUND, "验证码不存在或已失效"))
+                .equals(params.getOtpCode());
+        if (!isMatch) {
+            return Response.error(FORBIDDEN, "验证码不匹配");
         }
 
         UserModel userModel = BeanConverter.convert(params, new UserModel());
@@ -56,18 +63,21 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public Response<UserVO> login(
+    public Response<String> login(
             @RequestParam @Pattern(regexp = PATTERN_TELPHONE, message = "手机号码格式错误") String telphone,
             @RequestParam @Pattern(regexp = PATTERN_PASSWORD, message = "账号密码格式错误：要求 [6,32] 个非空字符") String password
     ) {
         UserVO userVO = UserVO.of(userService.login(telphone, password));
-        session.setAttribute(CURRENT_USER, userVO);
-        return Response.success(userVO);
+        // 生成用户登陆 Token
+        String userToken = UUID.randomUUID().toString().replace("-", "");
+        return Optional.ofNullable(Redis.setex(userToken, JSON.write(userVO), 60 * 60))
+                .map(result -> Response.success(userToken))
+                .orElse(Response.error("登录失败，请重试"));
     }
 
     @GetMapping("/logout")
-    public Response<?> logout() {
-        session.removeAttribute(CURRENT_USER);
+    public Response<?> logout(@RequestParam String userToken) {
+        Redis.del(userToken);
         return Response.success();
     }
 }

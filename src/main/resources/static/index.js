@@ -139,7 +139,8 @@ const seckill = {
                                 telphone: telphone,
                                 password: password,
                             },
-                            function () {
+                            function (response) {
+                                window.localStorage['userToken'] = response.data;
                                 window.location.href = seckill.pages.items;
                             },
                             function (response) {
@@ -320,12 +321,17 @@ const seckill = {
                 },
                 bindEventOnCreateOrderBtn: function (item, success, disabled = false) {
                     $('#create_order').on('click', function () {
+                        // 检查是否已经登录
+                        if (!window.localStorage["userToken"]) {
+                            window.location.href = seckill.pages.login;
+                        }
                         // 1. 设置按钮状态
                         $(this).attr('disabled', disabled);
                         // 2. 发送下单请求
                         Ajax.postForm(
                             seckill.urls.create_order,
                             {
+                                userToken: localStorage["userToken"],
                                 itemId: item.id,
                                 promoId: item.promoId,
                                 amount: item.amount ? item.amount : 1,
@@ -335,7 +341,7 @@ const seckill = {
                                     return success(response);
                                 } else {
                                     alert('下单成功'); // TODO 这里应该直接跳转到订单详情页面
-                                    window.location.href = seckill.pages.items;
+                                    window.location.reload();
                                 }
                             },
                             function (response) {
