@@ -52,9 +52,16 @@
    直接创建自定义配置文件 `$HOME/projects/seckill/application.properties` 来覆盖默认配置即可 (未自定义的参数仍然会使用默认配置)
 
    ```bash
-   spring.datasource.url=jdbc:mysql://xxx:3306/seckill?useUnicode=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
-   spring.datasource.username=xxx
-   spring.datasource.password=xxx
+   # DataSource
+   spring.datasource.url=jdbc:mysql://127.0.0.1:3306/seckill?useUnicode=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+   spring.datasource.username=root
+   spring.datasource.password=root
+   # Redis
+   spring.redis.host=127.0.0.1
+   spring.redis.port=6379
+   spring.redis.database=0
+   spring.redis.jedis.pool.max-active=50
+   spring.redis.jedis.pool.min-idle=50
    ```
 
 7. 直接启动本项目 `seckill start` 并通过 <http://localhost:8080/static/index.html> 进行访问
