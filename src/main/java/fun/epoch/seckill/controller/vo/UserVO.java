@@ -7,10 +7,12 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @ToString
-public class UserVO {
+public class UserVO implements Serializable {
     private Integer id;
     private String username;
     private String telphone;
