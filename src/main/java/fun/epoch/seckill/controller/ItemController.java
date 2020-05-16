@@ -1,5 +1,7 @@
 package fun.epoch.seckill.controller;
 
+import fun.epoch.core.cache.redis.Redis;
+import fun.epoch.core.serialization.JSON;
 import fun.epoch.core.web.bean.BeanConverter;
 import fun.epoch.core.web.response.Response;
 import fun.epoch.seckill.controller.params.ItemParams;
@@ -18,12 +20,18 @@ import java.util.List;
 @RequestMapping("/item")
 @CrossOrigin(origins = {"*"}, allowCredentials = "true")
 public class ItemController {
+    private static final String KEY_PREFIX_ITEM = "seckill:item:";
     @Resource
     private ItemService itemService;
 
     @GetMapping("/detail")
     public Response<ItemVO> detail(@NotNull(message = "商品 ID 不能为空") Integer id) {
-        return Response.success(ItemVO.of(itemService.detail(id)));
+        ItemVO itemVO = JSON.read(Redis.get(KEY_PREFIX_ITEM + id), ItemVO.class);
+        if (itemVO == null) {
+            itemVO = ItemVO.of(itemService.detail(id));
+            Redis.setex(KEY_PREFIX_ITEM + id, JSON.write(itemVO), 60 * 30);
+        }
+        return Response.success(itemVO);
     }
 
     @GetMapping("/list")
