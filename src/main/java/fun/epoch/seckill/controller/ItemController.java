@@ -1,5 +1,6 @@
 package fun.epoch.seckill.controller;
 
+import fun.epoch.core.cache.guava.GuavaCache;
 import fun.epoch.core.cache.redis.Redis;
 import fun.epoch.core.serialization.JSON;
 import fun.epoch.core.web.bean.BeanConverter;
@@ -26,11 +27,21 @@ public class ItemController {
 
     @GetMapping("/detail")
     public Response<ItemVO> detail(@NotNull(message = "商品 ID 不能为空") Integer id) {
-        ItemVO itemVO = JSON.read(Redis.get(KEY_PREFIX_ITEM + id), ItemVO.class);
+        // 1. 查询本地缓存
+        ItemVO itemVO = JSON.read(GuavaCache.get(KEY_PREFIX_ITEM + id), ItemVO.class);
         if (itemVO == null) {
-            itemVO = ItemVO.of(itemService.detail(id));
-            Redis.setex(KEY_PREFIX_ITEM + id, JSON.write(itemVO), 60 * 30);
+            // 2. 查询中间件缓存
+            itemVO = JSON.read(Redis.get(KEY_PREFIX_ITEM + id), ItemVO.class);
+            if (itemVO == null) {
+                // 3. 查询数据库
+                itemVO = ItemVO.of(itemService.detail(id));
+                // 2. 回填中间件缓存
+                Redis.setex(KEY_PREFIX_ITEM + id, JSON.write(itemVO), 60 * 30);
+            }
+            // 1. 回填本地缓存
+            GuavaCache.put(KEY_PREFIX_ITEM + id, JSON.write(itemVO));
         }
+
         return Response.success(itemVO);
     }
 
