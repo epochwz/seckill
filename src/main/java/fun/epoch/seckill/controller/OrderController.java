@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.Optional;
+import java.util.Random;
 
 import static fun.epoch.core.web.response.DefaultResponseCode.NEED_LOGIN;
 
@@ -33,5 +34,10 @@ public class OrderController {
                 .orElseThrow(() -> new BusinessException(NEED_LOGIN, "下单前请先登录"));
 
         return Response.success(OrderVO.of(orderService.createOrder(userVO.getId(), itemId, amount, promoId)));
+    }
+
+    @PostMapping(value = "/create/test")
+    public Response<?> createOrderTest() {
+        return Response.success(OrderVO.of(orderService.createOrder(new Random().nextInt(Integer.MAX_VALUE), 1000000, 1, 1000000)));
     }
 }
